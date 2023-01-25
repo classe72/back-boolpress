@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Tag;
+use App\Http\Requests\StoreTagRequest;
+use App\Http\Requests\UpdateTagRequest;
+class TagController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $tags = Tag::all();
+
+        return view('admin.tags.index', compact('tags'));
+    }
+
+
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  App\Http\Requests\StoreTagRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(StoreTagRequest $request)
+    {
+        //
+
+        //dd($request->all());
+
+        // validate
+        $val_data = $request->validated();
+
+        $val_data['slug'] = Str::slug($request->name);
+        // save
+        $tag = Tag::create($val_data);
+
+        // redirect
+        return back()->with('message', "Tag $tag->slug created successfully");
+    }
+
+
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateTagRequest  $request
+     * @param  \App\Models\Tag  $tag
+     * @return \Illuminate\Http\Response
+     */
+    public function update(UpdateTagRequest $request, Tag $tag)
+    {
+
+        //validate data
+        $val_data = $request->validated();
+        $val_data['slug'] = Str::slug($request->name);
+        // save
+        $tag->update($val_data);
+
+        // redirect
+        return back()->with('message', "Tag $tag->slug updated successfully");
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Tag  $tag
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Tag $tag)
+    {
+        $tag->delete();
+        return to_route('admin.tags.index')->with('message', "Tag $tag->slug Deleted successfully");
+    }
+}
